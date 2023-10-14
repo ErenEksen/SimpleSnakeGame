@@ -8,8 +8,8 @@ internal class Snake
     private readonly char _foodChar = '*';
     private readonly char[] _characterHead = { 'X', 'X', 'X', 'X' };
     private readonly char _characterBody = '#';
-    int _xBorderSize = 50;
-    int _yBorderSize = 50;
+    int _xBorderSize = 100;
+    int _yBorderSize = 30;
     
     private enum SnakeDirection {Right, Left, Up, Down}
     private SnakeDirection snakeDir = SnakeDirection.Right;
@@ -34,11 +34,11 @@ internal class Snake
 
     void sizeOfTheGameUserInput()
     {
-        string WidthText = "Please write the width of the playground"
-            , HeightText = "Please write the height of the playground";
+        string WidthText = "Please write the width of the playground (Default 100) : "
+            , HeightText = "Please write the height of the playground (Default 30) : ";
         
         Console.WriteLine(WidthText);
-        _xBorderSize = Convert.ToInt32( Console.ReadLine());
+        _xBorderSize = Convert.ToInt32( Console.Read(100));
         Console.SetCursorPosition(0,1);
         for (int i = 0; i < 50; i++)  Console.Write(' ');
         Console.SetCursorPosition(0,0);
@@ -46,7 +46,7 @@ internal class Snake
         Console.SetCursorPosition(0,0);
         
         Console.WriteLine(HeightText);
-        _yBorderSize = Convert.ToInt32( Console.ReadLine());
+        _yBorderSize = Convert.ToInt32( Console.Read(30));
         Console.SetCursorPosition(0,1);
         for (int i = 0; i < 50; i++)  Console.Write(' ');
         Console.SetCursorPosition(0,0);
@@ -107,7 +107,7 @@ internal class Snake
         Console.Write(text);
     }
     
-    //To print border of the game
+    //To print the border of the game
     private void PrintBorder()
     {
         Console.WriteLine();
@@ -163,6 +163,9 @@ internal class Snake
         foodSpawnAgain:
         var r = new Random();
 
+        //in Windows, Y coordinate of the Windows terminal starts from index 1.
+        //But in Linux/MacOS/Unix terminal, it just starts at index 0.
+        //So Food Spawner just changing behavior for windows terminal.
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) yFoodPosition = r.Next(2, _yBorderSize);
         else yFoodPosition = r.Next(1, _yBorderSize);
         xFoodPosition = r.Next(1, _xBorderSize - 1);
@@ -180,6 +183,7 @@ internal class Snake
         
         EndOfTheLine();
     }
+
     
     private async Task CharacterMovements()
     {
@@ -192,11 +196,13 @@ internal class Snake
             switch (snakeDir)
             {
                 case SnakeDirection.Right:
-                    WriteAt(' ', tempBodyX, tempBodyY);
-                    
+                    WriteAt(' ', tempBodyX, tempBodyY); //The last part of the tail will remove.
+
+                    //The last part of the tail will swap the place with previous head position
                     xBodyPosition[snakeLenght - 1] = xCharacterPosition;
                     yBodyPosition[snakeLenght - 1] = yCharacterPosition;
-                    
+                   
+                    //Array elements shifts by one.
                     for (int i = snakeLenght - 1; i > 0; i--)
                     {
                         (xBodyPosition[i], xBodyPosition[i - 1]) = (xBodyPosition[i - 1], xBodyPosition[i]);
@@ -204,6 +210,8 @@ internal class Snake
                     }
                     
                     xCharacterPosition++;
+
+                    //Draws the new position.
                     WriteAt(_characterBody, xBodyPosition[0]  , yBodyPosition[0] );
                     WriteAt(_characterHead[0], xCharacterPosition, yCharacterPosition);
                     break;
@@ -224,7 +232,6 @@ internal class Snake
                     WriteAt(_characterHead[0], xCharacterPosition, yCharacterPosition);
                     break;
                 case SnakeDirection.Up:
-                    WriteAt(' ', tempBodyX, tempBodyY);
                     WriteAt(' ', tempBodyX, tempBodyY);
                     
                     xBodyPosition[snakeLenght - 1] = xCharacterPosition;
@@ -264,6 +271,7 @@ internal class Snake
         
     }
 
+    //Checks if player bumps into a wall, tail or food.
     private void checkTheCollider(int tempBodyX, int tempBodyY)
     {
         if ((xCharacterPosition == xFoodPosition) & (yCharacterPosition == yFoodPosition))
@@ -277,10 +285,11 @@ internal class Snake
         for (int i = 0; i < snakeLenght; i++)
         {
             if (xBodyPosition[i] == xCharacterPosition & yBodyPosition[i] == yCharacterPosition)
-            endGame();
+                endGame();
         }
     }
 
+    //Stops the thread with "You're Dead" text.
     void endGame()
     {
         string endingMessage = "You're Dead";
@@ -290,6 +299,7 @@ internal class Snake
         Console.ReadKey();
     }
 
+    //Reassigns the cursor to the bottom right after each operation.
     private void EndOfTheLine()
     {
         Console.SetCursorPosition(_xBorderSize,_yBorderSize); 
