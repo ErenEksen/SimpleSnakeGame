@@ -6,7 +6,7 @@ internal class Snake
 {
     private readonly char _borderChar = '#';
     private readonly char _foodChar = '*';
-    private readonly char[] _characterHead = { 'X', 'X', 'X', 'X' };
+    private readonly char _characterHead = 'X';
     private readonly char _characterBody = '#';
     int _xBorderSize = 100;
     int _yBorderSize = 30;
@@ -136,7 +136,7 @@ internal class Snake
         xBodyPosition[0] = xCharacterPosition - 1;
         yBodyPosition[0] = yCharacterPosition = (_yBorderSize / 2);
         
-        WriteAt(_characterHead[0], xCharacterPosition, yCharacterPosition);
+        WriteAt(_characterHead, xCharacterPosition, yCharacterPosition);
         WriteAt(_characterBody, xBodyPosition[0], yBodyPosition[0]);
         
     }
@@ -211,7 +211,7 @@ internal class Snake
 
                     //Draws the new position.
                     WriteAt(_characterBody, xBodyPosition[0]  , yBodyPosition[0] );
-                    WriteAt(_characterHead[0], xCharacterPosition, yCharacterPosition);
+                    WriteAt(_characterHead, xCharacterPosition, yCharacterPosition);
                     break;
                 case SnakeDirection.Left:
                     WriteAt(' ', tempBodyX, tempBodyY);
@@ -227,7 +227,7 @@ internal class Snake
                     
                     xCharacterPosition--;
                     WriteAt(_characterBody, xBodyPosition[0]  , yBodyPosition[0] );
-                    WriteAt(_characterHead[0], xCharacterPosition, yCharacterPosition);
+                    WriteAt(_characterHead, xCharacterPosition, yCharacterPosition);
                     break;
                 case SnakeDirection.Up:
                     WriteAt(' ', tempBodyX, tempBodyY);
@@ -243,7 +243,7 @@ internal class Snake
                     
                     yCharacterPosition--;
                     WriteAt(_characterBody, xBodyPosition[0]  , yBodyPosition[0] );
-                    WriteAt(_characterHead[0], xCharacterPosition, yCharacterPosition);
+                    WriteAt(_characterHead, xCharacterPosition, yCharacterPosition);
                     break;
                 case SnakeDirection.Down:
                     WriteAt(' ', tempBodyX, tempBodyY);
@@ -259,7 +259,7 @@ internal class Snake
                     
                     yCharacterPosition++;
                     WriteAt(_characterBody, xBodyPosition[0]  , yBodyPosition[0] );
-                    WriteAt(_characterHead[0], xCharacterPosition, yCharacterPosition);
+                    WriteAt(_characterHead, xCharacterPosition, yCharacterPosition);
                     break;
             }
             
