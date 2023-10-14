@@ -34,23 +34,21 @@ internal class Snake
 
     void sizeOfTheGameUserInput()
     {
-        string WidthText = "Please write the width of the playground (Default 100) : "
+        string WidthText = "Please write the width of the playground (Default 75) : "
             , HeightText = "Please write the height of the playground (Default 30) : ";
         
-        Console.WriteLine(WidthText);
-        _xBorderSize = Convert.ToInt32( Console.Read(100));
-        Console.SetCursorPosition(0,1);
-        for (int i = 0; i < 50; i++)  Console.Write(' ');
+        Console.Write(WidthText);
+        string input = Console.ReadLine();
+        _xBorderSize = string.IsNullOrEmpty(input) ? 75 : Convert.ToInt32(input);
         Console.SetCursorPosition(0,0);
-        for (int i = 0; i < 50; i++)  Console.Write(' ');
+        for (int i = 0; i < 75; i++)  Console.Write(' ');
         Console.SetCursorPosition(0,0);
         
-        Console.WriteLine(HeightText);
-        _yBorderSize = Convert.ToInt32( Console.Read(30));
-        Console.SetCursorPosition(0,1);
-        for (int i = 0; i < 50; i++)  Console.Write(' ');
+        Console.Write(HeightText);
+        input = Console.ReadLine();
+        _yBorderSize = string.IsNullOrEmpty(input) ? 30 : Convert.ToInt32(input);
         Console.SetCursorPosition(0,0);
-        for (int i = 0; i < 50; i++)  Console.Write(' ');
+        for (int i = 0; i < 75; i++)  Console.Write(' ');
         Console.SetCursorPosition(0,0);
     }
     
