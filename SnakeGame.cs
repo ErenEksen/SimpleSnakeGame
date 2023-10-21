@@ -4,11 +4,12 @@ namespace SnakeGame;
 
 internal class Snake
 {
-    private readonly char _borderChar = '#';
+    private readonly char _borderChar = '\u25a0';
     private readonly char _foodChar = '*';
     private readonly char _characterHead = 'X';
     private readonly char _characterBody = '#';
-    int _xBorderSize = 100;
+    private bool isUserOnWindows = false;
+    int _xBorderSize = 75;
     int _yBorderSize = 30;
     
     private enum SnakeDirection {Right, Left, Up, Down}
@@ -21,34 +22,54 @@ internal class Snake
     public void StartGame(CancellationToken token = default)
     {
         Console.Clear();
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) isUserOnWindows = true;
         sizeOfTheGameUserInput();
+        TerminalColor();
         PrintBorder();
         DrawChar();
         FoodSpawn();
         keyReader();
         CharacterMovements();
         EndOfTheLine();
-        
         Thread.Sleep(Timeout.Infinite);
     }
 
+    void TerminalColor()
+    {
+        
+        //It changes the color of the terminal
+        Console.BackgroundColor = ConsoleColor.DarkGreen;
+        Console.ForegroundColor = ConsoleColor.White;
+        for (int y = 0; y < _yBorderSize; y++)
+            for (int x = 1; x < _xBorderSize; x++)  WriteAt(' ',x,y);
+
+        Console.SetCursorPosition(0,0);
+    }
+
+    //it gets the game size value from user. If user do not type anything, it will automaticly use the default values.
     void sizeOfTheGameUserInput()
     {
-        string WidthText = "Please write the width of the playground (Default 75) : "
-            , HeightText = "Please write the height of the playground (Default 30) : ";
+        string WidthText = $"Please write the width of the playground (Default : All Terminal is Playground) : "
+            , HeightText = $"Please write the height of the playground (Default : All Terminal is Playground) : ";
+        
+        
         
         Console.Write(WidthText);
         string input = Console.ReadLine();
-        _xBorderSize = string.IsNullOrEmpty(input) ? 75 : Convert.ToInt32(input);
+        int ConsoleWidth = Console.WindowWidth;
+        if (isUserOnWindows) ConsoleWidth--; //in Windows, Console size calculating different than Unix terminals. It fixes that misbehaving
+        _xBorderSize = string.IsNullOrEmpty(input) ? ConsoleWidth : Convert.ToInt32(input);
         Console.SetCursorPosition(0,0);
-        for (int i = 0; i < 75; i++)  Console.Write(' ');
+        for (int i = 0; i < 100; i++)  Console.Write(' ');
         Console.SetCursorPosition(0,0);
         
         Console.Write(HeightText);
         input = Console.ReadLine();
-        _yBorderSize = string.IsNullOrEmpty(input) ? 30 : Convert.ToInt32(input);
+        int ConsoleHeight = Console.WindowHeight;
+        if (isUserOnWindows) ConsoleHeight--; //in Windows, Console size calculating different than Unix terminals. It fixes that misbehaving
+        _yBorderSize = string.IsNullOrEmpty(input) ? ConsoleHeight : Convert.ToInt32(input);
         Console.SetCursorPosition(0,0);
-        for (int i = 0; i < 75; i++)  Console.Write(' ');
+        for (int i = 0; i < 100; i++)  Console.Write(' ');
         Console.SetCursorPosition(0,0);
     }
     
@@ -92,13 +113,13 @@ internal class Snake
         //keyReader();
     }
     
-    // To write a char to spesific coordinate with single line of code.
+    // To write a char to specific coordinate with single line of code.
     private void WriteAt(char Character, int x, int y)
     {
         Console.SetCursorPosition(x,y);
         Console.Write(Character);
     }
-    // To write a string after spesific coordinate with single line of code.
+    // To write a string after specific coordinate with single line of code.
     private void WriteAtString(string text, int x, int y)
     {
         Console.SetCursorPosition(x,y);
@@ -108,23 +129,21 @@ internal class Snake
     //To print the border of the game
     private void PrintBorder()
     {
-        Console.WriteLine();
         for (int i = 0; i < _xBorderSize; i++)
         {
             Console.Write(_borderChar);
         }
 
-        for (int i = 0; i < _yBorderSize; i++)
+        for (int i = 1; i < _yBorderSize; i++)
         {
             WriteAt(_borderChar,0,i);
             WriteAt(_borderChar,_xBorderSize - 1,i);
         }
-        Console.Write('\n');
-        for (int i = 0;i < _xBorderSize; i++)
-        {
-            Console.Write(_borderChar);
-        }
-
+        
+        Console.SetCursorPosition(0,_yBorderSize); //This was Console.WriteLine.
+        
+        for (int i = 0;i < _xBorderSize; i++)  Console.Write(_borderChar);
+        
         _yBorderSize = Console.CursorTop;
         _xBorderSize = Console.CursorLeft;
     }
@@ -160,12 +179,8 @@ internal class Snake
     {
         foodSpawnAgain:
         var r = new Random();
-
-        //in Windows, Y coordinate of the Windows terminal starts from index 1.
-        //But in Linux/MacOS/Unix terminal, it just starts at index 0.
-        //So Food Spawner just changing behavior for windows terminal.
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) yFoodPosition = r.Next(2, _yBorderSize);
-        else yFoodPosition = r.Next(1, _yBorderSize);
+        
+        yFoodPosition = r.Next(1, _yBorderSize);
         xFoodPosition = r.Next(1, _xBorderSize - 1);
         
 
@@ -300,7 +315,12 @@ internal class Snake
     //Reassigns the cursor to the bottom right after each operation.
     private void EndOfTheLine()
     {
-        Console.SetCursorPosition(_xBorderSize,_yBorderSize); 
+        //Terminal behaves different in windows
+        if (isUserOnWindows)
+            Console.SetCursorPosition(_xBorderSize-1,_yBorderSize-1);
+        else
+            Console.SetCursorPosition(_xBorderSize,_yBorderSize);
+        
     }
 
 }
